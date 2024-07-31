@@ -101,6 +101,8 @@ class phvalidator:
         if(self.phsensor.ph_value==0):
             temp=((self.assc_chemical_sensor.chemical_value-0.5)/2.75)*8.07
             self.dosing_value=temp
+            self.phsensor.ph_value=7
+
 
   
 # STAGE - 01
@@ -132,18 +134,18 @@ LIT301=level_sensor('LIT301',220,FIT301,FIT401,1200,200,1250,21.478)
 AIT301=chemical_sensor(235.97,LIT301,'Cl2')
 DPH101=phsensor(AIT301)
 PHP101=phvalidator(DPH101,AIT301)
-PHP101.maintain_ph_dosing()
+
 print(f'dosing level {PHP101.dosing_value}')
 def write_into_csv(data):
     with open('SWAT_STAGE1_DATA.csv','a') as f:
-        fields=['Timestamp','FIT101','MV101','LIT101','P101','FIT201','LIT201','AIT201','P201','AIT202','P202','AIT203','P203','P301','FIT301','LIT301','AIT301','FIT401','MV401','LIT101 Markers','LIT201 Markers']
+        fields=['Timestamp','FIT101','MV101','LIT101','P101','FIT201','LIT201','AIT201','P201','AIT202','P202','AIT203','P203','P301','FIT301','LIT301','AIT301','DPH101','PHP101','FIT401','MV401','LIT101 Markers','LIT201 Markers']
         writer = csv.DictWriter(f, fieldnames=fields, lineterminator='\n')
         writer.writerow(data)
 
 
 def collect_data():
     d=datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-    data={'Timestamp':d,'FIT101':FIT101.flow_rate,'MV101':MV101.state,'LIT101':LIT101.level_value,'P101':P101.state,'FIT201':FIT201.flow_rate,'LIT201':LIT201.level_value,'AIT201':AIT201.chemical_value,'P201':P201.dosing_value,'AIT202':AIT202.chemical_value,'P202':P202.dosing_value,'AIT203':AIT203.chemical_value,'P203':P203.dosing_value,'P301':P301.state,'FIT301':FIT301.flow_rate,'LIT301':LIT301.level_value,'AIT301':AIT301.chemical_value,'FIT401':FIT401.flow_rate,'MV401':MV401.state,'LIT101 Markers':{'CAP':LIT101.capacity,'LR':LIT101.low_level,'HR':LIT101.high_level},'LIT201 Markers':{'CAP':LIT201.capacity,'LR':LIT201.low_level,'HR':LIT201.high_level}}
+    data={'Timestamp':d,'FIT101':FIT101.flow_rate,'MV101':MV101.state,'LIT101':LIT101.level_value,'P101':P101.state,'FIT201':FIT201.flow_rate,'LIT201':LIT201.level_value,'AIT201':AIT201.chemical_value,'P201':P201.dosing_value,'AIT202':AIT202.chemical_value,'P202':P202.dosing_value,'AIT203':AIT203.chemical_value,'P203':P203.dosing_value,'P301':P301.state,'FIT301':FIT301.flow_rate,'LIT301':LIT301.level_value,'AIT301':AIT301.chemical_value,'DPH101':DPH101.ph_value,'PHP101':PHP101.dosing_value,'FIT401':FIT401.flow_rate,'MV401':MV401.state,'LIT101 Markers':{'CAP':LIT101.capacity,'LR':LIT101.low_level,'HR':LIT101.high_level},'LIT201 Markers':{'CAP':LIT201.capacity,'LR':LIT201.low_level,'HR':LIT201.high_level}}
     write_into_csv(data)
     return data
 while(True):
@@ -168,6 +170,11 @@ while(True):
         P203.check_dosing_level(LIT201)
         P301.open_walve([LIT201,LIT301]) 
     elif(count==40):
-        break;
+        P301.close_walve()
+    elif(count==50):
+        PHP101.maintain_ph_dosing()
+    elif(count==60):
+        break
+
     print(collect_data())
     time.sleep(1)
