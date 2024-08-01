@@ -218,35 +218,36 @@ while(True):
     LIT301.set_level_val()
     LIT401.set_level_val()
     count+=1
-    if(count==5):
+    if(count==300):
         P101.open_walve([LIT101,LIT201])
-    elif(count==10):
+    elif(count==600):
         MV101.open_walve([LIT101])
-    elif(count==15):
+    elif(count==1200):
         P101.close_walve()
-    elif(count==20):
+    elif(count==4800):
         MV101.close_walve()
-    elif(count==25):
+    elif(count==4801):
         P101.open_walve([LIT101,LIT201])
-    elif(count==30):
+    elif(count==(4801+3600)):
         P101.close_walve()
         P201.check_dosing_level(LIT201)
         P202.check_dosing_level(LIT201)
         P203.check_dosing_level(LIT201)
+    elif(count==(4801+3600+300)):
         P301.open_walve([LIT201,LIT301]) 
-    elif(count==35):
+    elif(count==(8701+3600)):
         P301.close_walve()
-    elif(count==40):
+    elif(count==(8702+3600)):
         PHP101.maintain_ph_dosing()
         MV401.open_walve([LIT401])
-    elif(count==45):
+    elif(count==(8702+3600+1800)):
         MV401.close_walve()
-    elif(count==50):
+    elif(count==(8702+3600+1800+1)):
         DP401.check_dosing_level(LIT401)
         DP402.check_dosing_level(LIT401)
-    elif(count==55):
+    elif(count==14105):
         P401.open_walve([LIT101,LIT401])
-    elif(count==65):
+    elif(count==14300):
         break;
 
     print(collect_data())
