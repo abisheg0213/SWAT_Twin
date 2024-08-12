@@ -1,0 +1,67 @@
+img{
+  margin-top: 50px;
+  width: 1200px;
+  height: 650px;
+}
+.button-layout {
+  width: 70%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.status-bar {
+  background-color: #f8f8f8;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #a00;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+}
+
+.button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button.red {
+  background-color: #ffcccc;
+}
+
+.button.green {
+  background-color: #ccffcc;
+}
+
+.button.black {
+  background-color: #ccc;
+  color: #fff;
+}
+
+.button.yellow {
+  background-color: #ffffcc;
+}
+
+.button.wide {
+  flex: 2;
+}
+
+.button:hover {
+  background-color: #e6e6e6;
+}
