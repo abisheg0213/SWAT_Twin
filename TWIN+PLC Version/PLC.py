@@ -24,7 +24,7 @@ def receive_data():
                 'component':'MV101',
                 'command':'open'
         })
-    if(f['LIT101']>=502 and stage==1):
+    if(f['LIT101']>=600 and stage==1):
         stage=2
         publisher.send_json({
             'type':'valve',
@@ -38,7 +38,7 @@ def receive_data():
                 'component':'P101',
                 'command':'open'
         })
-    if(f['LIT201']>=252 and stage==2):
+    if(f['LIT201']>=350 and stage==2):
         stage=3
         print("attack found")
         publisher.send_json({
@@ -53,7 +53,7 @@ def receive_data():
                 'component':'P301',
                 'command':'open'
         })
-    if(f['LIT301']>=222 and stage==3):
+    if(f['LIT301']>=320 and stage==3):
         stage=4
         print("attack found")
         publisher.send_json({
@@ -68,7 +68,7 @@ def receive_data():
                 'component':'MV401',
                 'command':'open'
         })
-    if(f['LIT401']>=252 and stage==4):
+    if(f['LIT401']>=350 and stage==4):
         stage=5
         print("attack found")
         publisher.send_json({
