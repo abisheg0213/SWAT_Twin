@@ -280,6 +280,29 @@ def recevie_data():
                         MV401.close_walve()
                         DP401.check_dosing_level(LIT401)
                         DP402.check_dosing_level(LIT401)
+            elif(data['type']=='level'):
+                if(data['component']=='LIT101'):
+                    if(data['command']=='static'):
+                        LIT101.level_value=data['attack-value']
+                if(data['component']=='LIT201'):
+                    if(data['command']=='static'):
+                        LIT201.level_value=data['attack-value']
+                if(data['component']=='LIT301'):
+                    if(data['command']=='static'):
+                        LIT301.level_value=data['attack-value']
+                if(data['component']=='LIT401'):
+                    if(data['command']=='static'):
+                        LIT401.level_value=data['attack-value']
+            elif(data['type']=='chemical'):
+                if(data['component']=='P201'):
+                    if(data['command']=='marker change'):
+                        P201.set_chem_limit(data['attack-value'])
+                if(data['component']=='P202'):
+                    if(data['command']=='marker change'):
+                        P202.set_chem_limit(data['attack-value'])
+                if(data['component']=='P203'):
+                    if(data['command']=='marker change'):
+                        P203.set_chem_limit(data['attack-value'])
  
         time.sleep(1)
 def send_data():
