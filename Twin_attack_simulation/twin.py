@@ -246,129 +246,126 @@ attack_socket = context2.socket(zmq.SUB)
 attack_socket.connect("tcp://localhost:5878")
 attack_socket.setsockopt(zmq.SUBSCRIBE, b"")
 state_lock = threading.Lock()
+poller = zmq.Poller()
+poller.register(socket, zmq.POLLIN)
+poller.register(attack_socket, zmq.POLLIN)
 def recevie_data():
     while True:
-        socket.setsockopt(zmq.SUBSCRIBE, b"")
-        attack_socket.setsockopt(zmq.SUBSCRIBE, b"")
         with state_lock:
-            message = socket.recv_multipart()
-            d=message[0].decode('UTF-8')
-            data=d
-            f=eval(data)
-            print(f)
-            data=f
-            if(data['type']=='valve'):
-                if(data['component']=='MV101'):
-                    if(data['command']=='open'):
-                        MV101.open_walve([LIT101])
-                        print("MV101 STATE"+str(MV101.state))
-                    else:
-                        MV101.close_walve()
-                elif(data['component']=='P101'):
-                    if(data['command']=='open'):
-                        P101.open_walve([LIT101,LIT201])
-                    else:
-                        P101.close_walve()
-                        P201.check_dosing_level(LIT201)
-                        P202.check_dosing_level(LIT201)
-                        P203.check_dosing_level(LIT201)   
-                elif(data['component']=='P301'):
-                    if(data['command']=='open'):
-                        P301.open_walve([LIT201,LIT301]) 
-                    else:
-                        P301.close_walve()
-                        PHP101.maintain_ph_dosing()        
-                elif(data['component']=='MV401'):
-                    if(data['command']=='open'):
-                        MV401.open_walve([LIT401])
-                    else:
-                        MV401.close_walve()
-                        DP401.check_dosing_level(LIT401)
-                        DP402.check_dosing_level(LIT401)
-            elif(data['type']=='level'):
-                if(data['component']=='LIT101'):
-                    if(data['command']=='static'):
-                        LIT101.level_value=data['attack-value']
-                if(data['component']=='LIT201'):
-                    if(data['command']=='static'):
-                        LIT201.level_value=data['attack-value']
-                if(data['component']=='LIT301'):
-                    if(data['command']=='static'):
-                        LIT301.level_value=data['attack-value']
-                if(data['component']=='LIT401'):
-                    if(data['command']=='static'):
-                        LIT401.level_value=data['attack-value']
-            elif(data['type']=='chemical'):
-                if(data['component']=='P201'):
-                    if(data['command']=='marker change'):
-                        P201.set_chem_limit(data['attack-value'])
-                if(data['component']=='P202'):
-                    if(data['command']=='marker change'):
-                        P202.set_chem_limit(data['attack-value'])
-                if(data['component']=='P203'):
-                    if(data['command']=='marker change'):
-                        P203.set_chem_limit(data['attack-value'])
-
-            #  attack induction
-            message1 = attack_socket.recv_multipart()
-            d1=message1[0].decode('UTF-8')
-            data1=d1
-            f1=eval(data1)
-            print(f1)
-            data1=f1
-            with open("log.txt",'a')as f:
-                f.write(str(data1)+"\n")
-            if(data1['type']=='valve'):
-                if(data1['component']=='MV101'):
-                    if(data1['command']=='open'):
-                        MV101.open_walve([LIT101])
-                        print("MV101 STATE"+str(MV101.state))
-                    else:
-                        MV101.close_walve()
-                elif(data1['component']=='P101'):
-                    if(data1['command']=='open'):
-                        P101.open_walve([LIT101,LIT201])
-                    else:
-                        P101.close_walve()
-                        P201.check_dosing_level(LIT201)
-                        P202.check_dosing_level(LIT201)
-                        P203.check_dosing_level(LIT201)   
-                elif(data1['component']=='P301'):
-                    if(data1['command']=='open'):
-                        P301.open_walve([LIT201,LIT301]) 
-                    else:
-                        P301.close_walve()
-                        PHP101.maintain_ph_dosing()        
-                elif(data1['component']=='MV401'):
-                    if(data1['command']=='open'):
-                        MV401.open_walve([LIT401])
-                    else:
-                        MV401.close_walve()
-                        DP401.check_dosing_level(LIT401)
-                        DP402.check_dosing_level(LIT401)
-            elif(data1['type']=='level'):
-                if(data1['component']=='LIT101'):
-                    if(data1['command']=='static'):
-                        LIT101.level_value=data1['attack-value']
-                if(data1['component']=='LIT201'):
-                    if(data1['command']=='static'):
-                        LIT201.level_value=data1['attack-value']
-                if(data1['component']=='LIT301'):
-                    if(data1['command']=='static'):
-                        LIT301.level_value=data1['attack-value']
-                if(data1['component']=='LIT401'):
-                    if(data1['command']=='static'):
-                        LIT401.level_value=data1['attack-value']
-            elif(data1['type']=='chemical'):
-                if(data1['component']=='P201'):
-                    if(data1['command']=='marker change'):
-                        P201.set_chem_limit(data1['attack-value'])
-                if(data1['component']=='P202'):
-                    if(data1['command']=='marker change'):
-                        P202.set_chem_limit(data1['attack-value'])
-                if(data1['component']=='P203'):
-                    if(data1['command']=='marker change'):
-                        P203.set_chem_limit(data1['attack-value'])
+            socks = dict(poller.poll(1000))
+            if socket in socks and socks[socket] == zmq.POLLIN:
+                print("socket recvied")
+                message = socket.recv_multipart()
+                d = message[0].decode('UTF-8')
+                data = eval(d)
+                print(f"Plant Data: {data}")
+                if(data['type']=='valve'):
+                    if(data['component']=='MV101'):
+                        if(data['command']=='open'):
+                            MV101.open_walve([LIT101])
+                            print("MV101 STATE"+str(MV101.state))
+                        else:
+                            MV101.close_walve()
+                    elif(data['component']=='P101'):
+                        if(data['command']=='open'):
+                            P101.open_walve([LIT101,LIT201])
+                        else:
+                            P101.close_walve()
+                            P201.check_dosing_level(LIT201)
+                            P202.check_dosing_level(LIT201)
+                            P203.check_dosing_level(LIT201)   
+                    elif(data['component']=='P301'):
+                        if(data['command']=='open'):
+                            P301.open_walve([LIT201,LIT301]) 
+                        else:
+                            P301.close_walve()
+                            PHP101.maintain_ph_dosing()        
+                    elif(data['component']=='MV401'):
+                        if(data['command']=='open'):
+                            MV401.open_walve([LIT401])
+                        else:
+                            MV401.close_walve()
+                            DP401.check_dosing_level(LIT401)
+                            DP402.check_dosing_level(LIT401)
+                elif(data['type']=='level'):
+                    if(data['component']=='LIT101'):
+                        if(data['command']=='static'):
+                            LIT101.level_value=data['attack-value']
+                    if(data['component']=='LIT201'):
+                        if(data['command']=='static'):
+                            LIT201.level_value=data['attack-value']
+                    if(data['component']=='LIT301'):
+                        if(data['command']=='static'):
+                            LIT301.level_value=data['attack-value']
+                    if(data['component']=='LIT401'):
+                        if(data['command']=='static'):
+                            LIT401.level_value=data['attack-value']
+                elif(data['type']=='chemical'):
+                    if(data['component']=='P201'):
+                        if(data['command']=='marker change'):
+                            P201.set_chem_limit(data['attack-value'])
+                    if(data['component']=='P202'):
+                        if(data['command']=='marker change'):
+                            P202.set_chem_limit(data['attack-value'])
+                    if(data['component']=='P203'):
+                        if(data['command']=='marker change'):
+                            P203.set_chem_limit(data['attack-value'])
+            if attack_socket in socks and socks[attack_socket] == zmq.POLLIN:
+                message1 = attack_socket.recv_multipart()
+                d1 = message1[0].decode('UTF-8')
+                data1 = eval(d1)
+                print(f"Attack Data: {data1}")
+                if(data1['type']=='valve'):
+                    if(data1['component']=='MV101'):
+                        if(data1['command']=='open'):
+                            MV101.open_walve([LIT101])
+                            print("MV101 STATE"+str(MV101.state))
+                        else:
+                            MV101.close_walve()
+                    elif(data1['component']=='P101'):
+                        if(data1['command']=='open'):
+                            P101.open_walve([LIT101,LIT201])
+                        else:
+                            P101.close_walve()
+                            P201.check_dosing_level(LIT201)
+                            P202.check_dosing_level(LIT201)
+                            P203.check_dosing_level(LIT201)   
+                    elif(data1['component']=='P301'):
+                        if(data1['command']=='open'):
+                            P301.open_walve([LIT201,LIT301]) 
+                        else:
+                            P301.close_walve()
+                            PHP101.maintain_ph_dosing()        
+                    elif(data1['component']=='MV401'):
+                        if(data1['command']=='open'):
+                            MV401.open_walve([LIT401])
+                        else:
+                            MV401.close_walve()
+                            DP401.check_dosing_level(LIT401)
+                            DP402.check_dosing_level(LIT401)
+                elif(data1['type']=='level'):
+                    if(data1['component']=='LIT101'):
+                        if(data1['command']=='static'):
+                            LIT101.level_value=data['attack-value']
+                    if(data1['component']=='LIT201'):
+                        if(data1['command']=='static'):
+                            LIT201.level_value=data['attack-value']
+                    if(data1['component']=='LIT301'):
+                        if(data1['command']=='static'):
+                            LIT301.level_value=data['attack-value']
+                    if(data1['component']=='LIT401'):
+                        if(data1['command']=='static'):
+                            LIT401.level_value=data['attack-value']
+                elif(data1['type']=='chemical'):
+                    if(data1['component']=='P201'):
+                        if(data1['command']=='marker change'):
+                            P201.set_chem_limit(data['attack-value'])
+                    if(data1['component']=='P202'):
+                        if(data1['command']=='marker change'):
+                            P202.set_chem_limit(data['attack-value'])
+                    if(data1['component']=='P203'):
+                        if(data1['command']=='marker change'):
+                            P203.set_chem_limit(data['attack-value'])       
         time.sleep(1)
 def send_data():
     while True:
