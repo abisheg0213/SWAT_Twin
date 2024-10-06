@@ -311,6 +311,7 @@ def recevie_data():
                         if(data['command']=='marker change'):
                             P203.set_chem_limit(data['attack-value'])
             if attack_socket in socks and socks[attack_socket] == zmq.POLLIN:
+                print("******&&&&&&&^^^^^^^^^")
                 message1 = attack_socket.recv_multipart()
                 d1 = message1[0].decode('UTF-8')
                 data1 = eval(d1)
@@ -346,26 +347,26 @@ def recevie_data():
                 elif(data1['type']=='level'):
                     if(data1['component']=='LIT101'):
                         if(data1['command']=='static'):
-                            LIT101.level_value=data['attack-value']
+                            LIT101.level_value=data1['attack-value']
                     if(data1['component']=='LIT201'):
                         if(data1['command']=='static'):
-                            LIT201.level_value=data['attack-value']
+                            LIT201.level_value=data1['attack-value']
                     if(data1['component']=='LIT301'):
                         if(data1['command']=='static'):
-                            LIT301.level_value=data['attack-value']
+                            LIT301.level_value=data1['attack-value']
                     if(data1['component']=='LIT401'):
                         if(data1['command']=='static'):
-                            LIT401.level_value=data['attack-value']
+                            LIT401.level_value=data1['attack-value']
                 elif(data1['type']=='chemical'):
                     if(data1['component']=='P201'):
                         if(data1['command']=='marker change'):
-                            P201.set_chem_limit(data['attack-value'])
+                            P201.set_chem_limit(data1['attack-value'])
                     if(data1['component']=='P202'):
                         if(data1['command']=='marker change'):
-                            P202.set_chem_limit(data['attack-value'])
+                            P202.set_chem_limit(data1['attack-value'])
                     if(data1['component']=='P203'):
                         if(data1['command']=='marker change'):
-                            P203.set_chem_limit(data['attack-value'])       
+                            P203.set_chem_limit(data1['attack-value'])       
         time.sleep(1)
 def send_data():
     while True:
